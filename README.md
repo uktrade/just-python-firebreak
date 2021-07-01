@@ -21,6 +21,19 @@ python -m pip install black flake8 jedi
 ```
 
 
+## Using setup tools to make a python executable 
+
+The main documentation that I have used for this is [python setup tools](https://setuptools.readthedocs.io/en/latest/)
+
+The specific part of the docs I have used for making this entry point is [entry points](https://setuptools.readthedocs.io/en/latest/userguide/entry_point.html#entry-points)
+
+This branch of commits is to show the basic common ways of making a python executable. The use of setup tools entry points and the __main__.py file also the basic lines
+
+```python
+if __name__ == "__main__":
+    run_start_point()
+```
+
 ## Building a release, Using wheel
 
 the command to build the Python only release
