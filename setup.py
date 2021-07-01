@@ -7,4 +7,5 @@ setup(
     author_email="ciaran.doherty@digital.trade.gov.uk",
     description="A firebreak learning project",
     packages=find_packages(),
+    python_requires=">=3.9",
 )
