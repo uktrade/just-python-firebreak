@@ -1,4 +1,5 @@
 import asyncio
+from pprint import pprint
 
 
 class EchoServerProtocol(asyncio.Protocol):
@@ -9,9 +10,9 @@ class EchoServerProtocol(asyncio.Protocol):
 
     def data_received(self, data):
         message = data.decode()
-        print("Data received: {!r}".format(message))
+        pprint(f"Data received: {message}")
+        pprint(f"Send: {message}")
 
-        print("Send: {!r}".format(message))
         self.transport.write(data)
 
         print("Close the client socket")
