@@ -1,11 +1,17 @@
+from pathlib import Path
+
 import aiohttp
 from aiohttp import web
 
 
 async def handle(request):
-    name = request.match_info.get("name", "Anonymous")
-    text = "Hello, " + name
-    return web.Response(text=text)
+    p = Path(".").absolute()
+    root_dir = p.parent
+    html_file = p / "data" / "index.html"
+    text = html_file.read_text()
+    return web.Response(text=text, content_type="text/html")
+
+
 async def websocket_handler(request):
     print("Websocket connection starting")
     ws = aiohttp.web.WebSocketResponse()
