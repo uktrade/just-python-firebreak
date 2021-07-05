@@ -24,29 +24,32 @@ async def websocket_handler(request: web.Request) -> web.WebSocketResponse:
 
     async for msg in ws:
         print(msg)
-        if msg.type == aiohttp.WSMsgType.TEXT:
-            print(msg.data)
-            if msg.data == "close":
-                print("CLOSE")
-                await ws.close()
-            else:
-                print("SEND")
-                await ws.send_str(msg.data + " Initial response answer")
-                time.sleep(2)
+        if msg.type != aiohttp.WSMsgType.TEXT:
+            continue
 
-                # interleaving synchronous and asynchronous code
-                count: int = get_call_count()
-                await ws.send_str(f"Call count {count} 3 seconds till json call")
-                time.sleep(1)
-                count = increament_call_count()
-                await ws.send_str(f"Call count {count} 2 seconds till json call")
-                time.sleep(1)
-                count = increament_call_count()
-                await ws.send_str(f"Call count {count} 1 seconds till json call")
-                time.sleep(1)
-                count = increament_call_count()
-                bh_data: dict = await get_bank_holidays()
-                await ws.send_str(json.dumps(bh_data))
+        print(msg.data)
+        if msg.data == "close":
+            print("CLOSE")
+            await ws.close()
+            continue
+
+        print("SEND")
+        await ws.send_str(msg.data + " Initial response answer")
+        time.sleep(2)
+
+        # interleaving synchronous and asynchronous code
+        count: int = get_call_count()
+        await ws.send_str(f"Call count {count} 3 seconds till json call")
+        time.sleep(1)
+        count = increament_call_count()
+        await ws.send_str(f"Call count {count} 2 seconds till json call")
+        time.sleep(1)
+        count = increament_call_count()
+        await ws.send_str(f"Call count {count} 1 seconds till json call")
+        time.sleep(1)
+        count = increament_call_count()
+        bh_data: dict = await get_bank_holidays()
+        await ws.send_str(json.dumps(bh_data))
 
     print("Websocket connection closed")
     return ws
