@@ -5,6 +5,7 @@ from pathlib import Path
 import aiohttp
 from aiohttp import web
 
+from .db import get_call_count, increament_call_count
 from .third_party_calls import get_bank_holidays
 
 
@@ -31,9 +32,20 @@ async def websocket_handler(request):
                 return
 
             print("SEND")
-            await ws.send_str(msg.data + "/answer")
-            # wait 3 seconds and then make a push to the browser
-            time.sleep(3)
+            await ws.send_str(msg.data + " Initial response answer")
+            time.sleep(2)
+
+            # interleaving synchronous and asynchronous code
+            count = get_call_count()
+            await ws.send_str(f"Call count {count} 3 seconds till json call")
+            time.sleep(1)
+            count = increament_call_count()
+            await ws.send_str(f"Call count {count} 2 seconds till json call")
+            time.sleep(1)
+            count = increament_call_count()
+            await ws.send_str(f"Call count {count} 1 seconds till json call")
+            time.sleep(1)
+            count = increament_call_count()
             bh_data = await get_bank_holidays()
             await ws.send_str(json.dumps(bh_data))
 
