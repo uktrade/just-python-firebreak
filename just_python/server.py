@@ -9,16 +9,16 @@ from .db import get_call_count, increament_call_count
 from .third_party_calls import get_bank_holidays
 
 
-async def handle(request):
-    p = Path(".").absolute()
-    html_file = p / "data" / "index.html"
-    text = html_file.read_text()
+async def handle(request: web.Request) -> web.Response:
+    p: Path = Path(".").absolute()
+    html_file: Path = p / "data" / "index.html"
+    text: str = html_file.read_text()
     return web.Response(text=text, content_type="text/html")
 
 
-async def websocket_handler(request):
+async def websocket_handler(request: web.Request) -> web.WebSocketResponse:
     print("Websocket connection starting")
-    ws = aiohttp.web.WebSocketResponse()
+    ws: web.WebSocketResponse = web.WebSocketResponse()
     await ws.prepare(request)
     print("Websocket connection ready")
 
@@ -29,32 +29,31 @@ async def websocket_handler(request):
             if msg.data == "close":
                 print("CLOSE")
                 await ws.close()
-                return
+            else:
+                print("SEND")
+                await ws.send_str(msg.data + " Initial response answer")
+                time.sleep(2)
 
-            print("SEND")
-            await ws.send_str(msg.data + " Initial response answer")
-            time.sleep(2)
-
-            # interleaving synchronous and asynchronous code
-            count = get_call_count()
-            await ws.send_str(f"Call count {count} 3 seconds till json call")
-            time.sleep(1)
-            count = increament_call_count()
-            await ws.send_str(f"Call count {count} 2 seconds till json call")
-            time.sleep(1)
-            count = increament_call_count()
-            await ws.send_str(f"Call count {count} 1 seconds till json call")
-            time.sleep(1)
-            count = increament_call_count()
-            bh_data = await get_bank_holidays()
-            await ws.send_str(json.dumps(bh_data))
+                # interleaving synchronous and asynchronous code
+                count: int = get_call_count()
+                await ws.send_str(f"Call count {count} 3 seconds till json call")
+                time.sleep(1)
+                count = increament_call_count()
+                await ws.send_str(f"Call count {count} 2 seconds till json call")
+                time.sleep(1)
+                count = increament_call_count()
+                await ws.send_str(f"Call count {count} 1 seconds till json call")
+                time.sleep(1)
+                count = increament_call_count()
+                bh_data: dict = await get_bank_holidays()
+                await ws.send_str(json.dumps(bh_data))
 
     print("Websocket connection closed")
     return ws
 
 
-def configure_http_server():
-    app = web.Application()
+def configure_http_server() -> web.Application:
+    app: web.Application = web.Application()
     app.add_routes(
         [
             web.get("/", handle),
