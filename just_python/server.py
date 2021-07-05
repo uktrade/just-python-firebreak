@@ -1,7 +1,11 @@
+import json
+import time
 from pathlib import Path
 
 import aiohttp
 from aiohttp import web
+
+from .third_party_calls import get_bank_holidays
 
 
 async def handle(request):
@@ -24,9 +28,14 @@ async def websocket_handler(request):
             if msg.data == "close":
                 print("CLOSE")
                 await ws.close()
-            else:
-                print("SEND")
-                await ws.send_str(msg.data + "/answer")
+                return
+
+            print("SEND")
+            await ws.send_str(msg.data + "/answer")
+            # wait 3 seconds and then make a push to the browser
+            time.sleep(3)
+            bh_data = await get_bank_holidays()
+            await ws.send_str(json.dumps(bh_data))
 
     print("Websocket connection closed")
     return ws
