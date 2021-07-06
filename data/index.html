@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  <body>
+
+    <div id="mydiv"></div>
+
+    <script type="application/javascript">
+     var ws = new WebSocket("ws://localhost:8080/ws");
+
+     // websocket onopen event listener
+     ws.onopen = e => {
+       console.log("connected websocket main component");
+       ws.send("this is a WS test");
+     };
+
+     // websocket onclose event listener
+     ws.onclose = e => {
+       if (e.wasClena) {
+         console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+       } else {
+         console.log("[close] Connection died")
+       }
+       console.log(
+         `Socket is closed.`,
+         e.reason
+       );
+
+     };
+
+     // message received - show the message in div#messages
+     ws.onmessage = function(event) {
+       let message = event.data;
+
+       let messageElem = document.createElement('div');
+       messageElem.textContent = message;
+       document.getElementById('messages').prepend(messageElem);
+     };
+
+     // websocket onerror event listener
+     ws.onerror = err => {
+       console.error(
+         "Socket encountered error: ",
+         err.message,
+         "Closing socket"
+       );
+
+         ws.close();
+     };
+
+    </script>
+    <div id="messages"/>
+  </body>
+</html>
