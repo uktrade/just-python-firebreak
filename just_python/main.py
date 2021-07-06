@@ -1,15 +1,18 @@
+import asyncio
 import http.server
 from .controllers.pokemon_controllers import getPokemons
 
 class routeHandler(http.server.BaseHTTPRequestHandler):
     base_path = "/api_v1"
-    
+
     def do_GET(self):
         path = self.path if self.path[-1] != "/" else self.path[:-1] 
 
         if path == self.base_path + "/pokemons":
             print("GET Pokemons")
-            getPokemons(self, path)
+            # Create event loop, run a coroutine, close the loop.
+            asyncio.run(getPokemons(self, path))
+            # getPokemons(self, path)
         
     def do_POST(self):
         print("POST")
@@ -23,4 +26,4 @@ def main():
     handler.serve_forever()
 
 if __name__ == "__main__":
-    main()
+   main()
