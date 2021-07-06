@@ -48,41 +48,18 @@ async def fetchPokemon(base_path, number):
     return data
 
 # 7.10secs run in concurrency
-async def getPokemons(self, path):
-
-    time_at_start = time.time()
-    pokemon_list = []
-    base_poke_api = "https://pokeapi.co/api/v2/pokemon/"
-    
-    for num in range(1, 50):
-        # Start an asyncio Task.
-        data = await asyncio.create_task(fetchPokemon(base_poke_api, num))
-        print(type(data))
-        # Byte type need to convert to str.
-        pokemon_list.append(data)
-
-    # Convert python object into a json string.
-    j = json.dumps(pokemon_list)
-    _set_response(self)
-    
-    time_sum = time.time() - time_at_start
-    print(f"Total seconds: {time_sum:.2f}")
-    # Encoding back into bytes for Python response.
-    self.wfile.write(j.encode())
-
-
-# 6.90 secs Python documentations desc as "run things in parallel"
 # async def getPokemons(self, path):
 
 #     time_at_start = time.time()
+#     pokemon_list = []
 #     base_poke_api = "https://pokeapi.co/api/v2/pokemon/"
-
-#     tasks = []
     
 #     for num in range(1, 50):
-#         tasks.append(fetchPokemon(base_poke_api, num))
-        
-#     pokemon_list = await asyncio.gather(*tasks)
+#         # Start an asyncio Task.
+#         data = await asyncio.create_task(fetchPokemon(base_poke_api, num))
+#         print(type(data))
+#         # Byte type need to convert to str.
+#         pokemon_list.append(data)
 
 #     # Convert python object into a json string.
 #     j = json.dumps(pokemon_list)
@@ -92,3 +69,26 @@ async def getPokemons(self, path):
 #     print(f"Total seconds: {time_sum:.2f}")
 #     # Encoding back into bytes for Python response.
 #     self.wfile.write(j.encode())
+
+
+# 6.90 secs Python documentations desc as "run things in parallel"
+async def getPokemons(self, path):
+
+    time_at_start = time.time()
+    base_poke_api = "https://pokeapi.co/api/v2/pokemon/"
+
+    tasks = []
+    
+    for num in range(1, 50):
+        tasks.append(fetchPokemon(base_poke_api, num))
+        
+    pokemon_list = await asyncio.gather(*tasks)
+
+    # Convert python object into a json string.
+    j = json.dumps(pokemon_list)
+    _set_response(self)
+    
+    time_sum = time.time() - time_at_start
+    print(f"Total seconds: {time_sum:.2f}")
+    # Encoding back into bytes for Python response.
+    self.wfile.write(j.encode())
